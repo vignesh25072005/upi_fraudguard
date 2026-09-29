@@ -1,128 +1,842 @@
-# UPI FraudGuard AI
+Absolutely. Below is a **complete, polished GitHub `README.md`** for your UPI FraudGuard AI project, including the full pipeline, installation, execution steps, architecture, results, project structure, and limitations.
 
-ML-based anomaly detection for UPI (Unified Payments Interface) transactions, with
-regional and merchant-category fraud risk aggregation.
+````markdown
+# 🛡️ UPI FraudGuard AI
 
-## ⚠️ About the data — read this first
+### AI-Powered UPI Transaction Fraud Detection & Risk Analytics
 
-Real, transaction-level UPI fraud data is **never public** — NPCI and RBI keep it
-confidential for security reasons, and no bank publishes labeled fraud data either
-(this is true worldwide, not just in India). So this project uses a **synthetic
-dataset** (`src/generate_data.py`) that mimics real UPI transaction behavior:
-realistic amount distributions per merchant category, Indian state/bank
-distributions, and four distinct fraud typologies (odd-hour high-value spikes,
-device switching, transaction-velocity bursts, unfamiliar bank combinations) mixed
-with noise so fraud isn't trivially separable.
+UPI FraudGuard AI is a Machine Learning-based fraud detection system designed to identify anomalous and potentially fraudulent Unified Payments Interface (UPI) transactions. The system analyzes transaction behavior, transaction velocity, amount deviations, device switching, transaction timing, bank combinations, merchant categories, and regional patterns to detect suspicious activity.
 
-This is the same approach every public "UPI fraud detection" dataset on Kaggle
-uses — none of them are real bank data either. Be upfront about this if you
-present the project (e.g. in a viva or interview) — it's expected and normal for
-this problem domain, not a shortcut.
+The project combines **behavioral feature engineering, imbalanced-learning techniques, multiple ML models, threshold optimization, and an interactive Streamlit dashboard** to provide transaction-level fraud detection along with regional and merchant-category risk analysis.
 
-## Results
+---
 
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC | PR-AUC |
-|---|---|---|---|---|---|---|
-| Logistic Regression | 80.0% | 2.1% | 66.7% | 4.2% | 0.795 | 0.333 |
-| Decision Tree | 88.3% | 3.5% | 64.7% | 6.7% | 0.798 | 0.468 |
-| Random Forest | 97.1% | 10.3% | 44.9% | 16.8% | 0.841 | 0.378 |
-| **XGBoost (tuned threshold)** | **99.6%** | **85.7%** | **50.0%** | **63.2%** | **0.881** | **0.560** |
+## 🚀 Key Features
 
-**Accuracy easily clears 90%+ (99.6%) — but accuracy is a misleading metric here**,
-since simply predicting "no fraud" for every transaction already scores 99.4%
-accuracy on this data. The metrics that actually matter for fraud detection are:
+- 🔍 UPI transaction fraud detection
+- 🤖 Machine Learning-based classification
+- ⚡ Behavioral anomaly detection
+- 📊 Transaction velocity analysis
+- 💰 Transaction amount deviation detection
+- 🌙 Odd-hour transaction detection
+- 📱 Device-switching detection
+- 🏦 Cross-bank transaction analysis
+- 🌍 State-wise fraud-risk aggregation
+- 🏪 Merchant-category risk analysis
+- 📈 Model performance comparison
+- 🎯 Fraud probability scoring
+- ⚙️ Tuned classification threshold
+- 📊 Interactive Streamlit dashboard
+- 🧪 Synthetic dataset generation
+- 🔄 Time-aware train/test splitting
+- ⚖️ SMOTE for class imbalance handling
 
-- **Precision (85.7%)** — when the model flags a transaction, it's right 86% of
-  the time. Low false-positive rate = fraud team isn't drowned in noise.
-- **Recall (50.0%)** — the model catches half of all fraud cases. This is the
-  realistic, honest number; catching significantly more without cratering
-  precision requires either more features (device fingerprinting, IP/geo data,
-  account age) or a lower-precision "review queue" tier, which is how real fraud
-  systems are layered in practice.
-- **PR-AUC (0.560)** — the right summary metric for rare-event detection, far more
-  informative than accuracy on a 0.6%-fraud dataset.
+---
 
-## Project structure
+# ⚠️ About the Dataset
 
+Real transaction-level UPI fraud data is not publicly available because banks, payment providers, NPCI, and financial institutions treat transaction and fraud records as confidential.
+
+Therefore, this project uses a **synthetic dataset** generated using:
+
+```text
+src/generate_data.py
+````
+
+The dataset is designed to mimic realistic UPI transaction behavior, including:
+
+* Indian states
+* Indian banks
+* Merchant categories
+* Transaction amounts
+* Transaction timestamps
+* Sender behavior
+* Device information
+* Fraud patterns
+
+The synthetic dataset contains approximately **120,000 transactions**, with around **0.6% fraudulent transactions**.
+
+### Simulated Fraud Typologies
+
+The dataset contains four primary fraud patterns:
+
+1. **Odd-hour high-value transactions**
+2. **Device switching**
+3. **Transaction-velocity bursts**
+4. **Unfamiliar bank combinations**
+
+Noise is also introduced so that fraud cannot be detected using a single obvious feature.
+
+> **Important:** The dataset is synthetic and should not be presented as real banking or NPCI transaction data.
+
+---
+
+# 📊 Model Results
+
+| Model               |  Accuracy | Precision |    Recall |  F1 Score |   ROC-AUC |    PR-AUC |
+| ------------------- | --------: | --------: | --------: | --------: | --------: | --------: |
+| Logistic Regression |     80.0% |      2.1% |     66.7% |      4.2% |     0.795 |     0.333 |
+| Decision Tree       |     88.3% |      3.5% |     64.7% |      6.7% |     0.798 |     0.468 |
+| Random Forest       |     97.1% |     10.3% |     44.9% |     16.8% |     0.841 |     0.378 |
+| **XGBoost**         | **99.6%** | **85.7%** | **50.0%** | **63.2%** | **0.881** | **0.560** |
+
+### ⚠️ Why Accuracy Is Not Enough
+
+Fraud detection is a highly imbalanced classification problem.
+
+Approximately **99.4% of transactions are legitimate**, meaning a model that predicts every transaction as legitimate could still achieve approximately 99.4% accuracy.
+
+Therefore, this project focuses on:
+
+* Precision
+* Recall
+* F1 Score
+* ROC-AUC
+* PR-AUC
+
+### XGBoost Performance
+
+The tuned XGBoost model achieved:
+
+* **Accuracy:** 99.6%
+* **Precision:** 85.7%
+* **Recall:** 50.0%
+* **F1 Score:** 63.2%
+* **ROC-AUC:** 0.881
+* **PR-AUC:** 0.560
+
+The tuned threshold prioritizes a stronger precision/recall balance than simply using the default 0.5 probability threshold.
+
+---
+
+# 🧠 Machine Learning Pipeline
+
+```text
+Synthetic UPI Data
+        ↓
+Data Preprocessing
+        ↓
+Feature Engineering
+        ↓
+Time-Aware Train/Test Split
+        ↓
+SMOTE on Training Data
+        ↓
+Model Training
+        ↓
+Model Evaluation
+        ↓
+Threshold Optimization
+        ↓
+XGBoost Fraud Prediction
+        ↓
+Risk Aggregation
+        ↓
+Streamlit Dashboard
 ```
-upi_fraud_project/
-├── data/
-│   ├── upi_transactions.csv              # raw synthetic dataset (120,000 rows)
-│   └── upi_transactions_features.csv     # after feature engineering
-├── models/
-│   ├── xgb_fraud_model.pkl               # trained XGBoost model
-│   ├── scaler.pkl                        # StandardScaler for numeric features
-│   ├── label_encoders.pkl                # LabelEncoders for categorical features
-│   └── best_threshold.json               # tuned decision threshold + feature order
-├── outputs/
-│   ├── model_metrics.json                # all model metrics
-│   ├── model_comparison.csv / .png       # model comparison table & chart
-│   ├── confusion_matrix.png
-│   ├── feature_importance.png
-│   ├── regional_risk.csv                 # state-wise flagged fraud rate
-│   └── category_risk.csv                 # merchant-category flagged fraud rate
-├── src/
-│   ├── generate_data.py                  # step 1: synthetic data generation
-│   ├── feature_engineering.py            # step 2: behavioral feature derivation
-│   ├── train_model.py                    # step 3: SMOTE + train + evaluate + save
-│   └── app.py                            # step 4: Streamlit dashboard
-└── README.md
+
+---
+
+# 🔬 Feature Engineering
+
+The project derives behavioral features from raw transaction information.
+
+### Transaction Velocity
+
+Measures the number of transactions performed by a sender within a specific time period.
+
+```text
+Transaction Velocity =
+Number of transactions by sender within time window
 ```
 
-## How to run
+A sudden burst of transactions can indicate suspicious activity.
+
+### Amount Deviation
+
+Measures how different the current transaction amount is from the sender's historical behavior.
+
+```text
+Amount Deviation =
+Current Transaction Amount - Historical Average Amount
+```
+
+Large deviations can indicate abnormal transactions.
+
+### Odd-Hour Flag
+
+Identifies transactions performed during unusual hours.
+
+### Device Switching
+
+Detects when a sender suddenly uses a different device from their previous transactions.
+
+### Cross-Bank Transactions
+
+Identifies transactions involving unfamiliar bank combinations.
+
+---
+
+# 🤖 Machine Learning Models
+
+The project compares multiple classification algorithms.
+
+## 1. Logistic Regression
+
+Used as the baseline model.
+
+It provides a simple and interpretable benchmark for fraud classification.
+
+## 2. Decision Tree
+
+A tree-based model capable of capturing non-linear relationships between transaction features.
+
+## 3. Random Forest
+
+An ensemble of decision trees that improves robustness and reduces overfitting.
+
+## 4. XGBoost
+
+The primary model used for fraud detection.
+
+XGBoost is a gradient-boosting algorithm that performs well on structured/tabular datasets and can capture complex relationships between behavioral features.
+
+---
+
+# ⚖️ Handling Class Imbalance
+
+Fraud transactions represent only a small fraction of the dataset.
+
+To address this imbalance, the project uses:
+
+### SMOTE
+
+**Synthetic Minority Over-sampling Technique**
+
+SMOTE generates synthetic examples of the minority class to provide the model with more fraud examples during training.
+
+SMOTE is applied **only to the training dataset**.
+
+The test dataset remains unchanged to provide a more realistic evaluation.
+
+---
+
+# ⏱️ Time-Aware Train/Test Split
+
+Instead of randomly splitting the dataset, transactions are divided chronologically.
+
+```text
+First 80%
+    ↓
+Training Data
+
+Last 20%
+    ↓
+Testing Data
+```
+
+This better represents a real-world fraud detection scenario where historical transactions are used to predict future transactions.
+
+---
+
+# 🎯 Threshold Optimization
+
+The default classification threshold of:
+
+```text
+0.50
+```
+
+is not always optimal for highly imbalanced fraud detection.
+
+The project evaluates different probability thresholds and selects a threshold based on the precision-recall trade-off.
+
+This allows the system to control the balance between:
+
+* False positives
+* False negatives
+* Precision
+* Recall
+
+The selected threshold is stored in:
+
+```text
+models/best_threshold.json
+```
+
+---
+
+# 🌍 Regional & Merchant Risk Analysis
+
+One of the key features of this project is aggregation of fraud-risk information.
+
+Instead of only detecting individual suspicious transactions, the system aggregates flagged transactions by:
+
+### Indian State
+
+Examples:
+
+```text
+Telangana
+Maharashtra
+Karnataka
+Tamil Nadu
+Delhi
+```
+
+### Merchant Category
+
+Examples:
+
+```text
+Food
+Shopping
+Travel
+Utilities
+Entertainment
+Healthcare
+```
+
+This allows the dashboard to highlight areas and merchant categories that may require additional monitoring.
+
+> These are model-generated risk indicators from synthetic data and should not be interpreted as evidence that any real Indian state, bank, or merchant category has higher fraud.
+
+---
+
+# 📊 Streamlit Dashboard
+
+The project includes an interactive Streamlit dashboard.
+
+Run:
 
 ```bash
-cd upi_fraud_project
-pip install pandas numpy scikit-learn imbalanced-learn xgboost matplotlib seaborn streamlit plotly joblib
-
-# 1. Generate the dataset
-python src/generate_data.py
-
-# 2. Engineer features
-python src/feature_engineering.py
-
-# 3. Train models, evaluate, save artifacts
-python src/train_model.py
-
-# 4. Launch the dashboard
-cd src && streamlit run app.py
+streamlit run src/app.py
 ```
 
-## Pipeline explained
+The dashboard contains three primary sections.
 
-1. **Data generation** — 120,000 UPI transactions across 25,000 simulated senders,
-   July–August 2026, 10 Indian states, 8 banks, 11 merchant categories. ~0.6% are
-   fraudulent (realistic order of magnitude), across 4 different fraud patterns.
-2. **Feature engineering** — derives transaction velocity (txns/hour per sender),
-   amount deviation from sender's historical average, odd-hour flag, device-switch
-   flag, cross-bank flag. These behavioral signals are what actually separate
-   fraud from genuine activity — raw amount alone doesn't.
-3. **Time-aware train/test split** — trained on the first 80% of transactions
-   chronologically, tested on the last 20%. This is more realistic than a random
-   split, since in production you're always predicting on transactions that
-   happen *after* your training data.
-4. **SMOTE** — applied only to the training set (never the test set — that would
-   leak information) to balance the ~0.6% fraud rate before training.
-5. **Three models compared** — Logistic Regression (baseline), Random Forest,
-   XGBoost (primary model). XGBoost wins on every metric.
-6. **Threshold tuning** — the default 0.5 probability threshold is rarely optimal
-   for imbalanced problems; the script finds the threshold that maximizes F1 on
-   the precision-recall curve.
-7. **Regional & category risk aggregation** — the project's differentiator: flagged
-   transactions are aggregated by state and merchant category to surface which
-   regions/categories need more monitoring attention — not just individual
-   transaction flags.
-8. **Dashboard** — Streamlit app with three tabs: model performance, regional/
-   category risk view, and a live "score a transaction" tool. Custom dark theme
-   (`.streamlit/config.toml`, duplicated inside `src/` so it's picked up regardless
-   of which folder you launch from) plus custom CSS in `app.py` for a polished,
-   card-based layout instead of Streamlit's plain defaults.
+### 1. Model Performance
 
-## Honest next steps if you want to push recall higher
+Displays:
 
-- Add device-fingerprint / IP-geolocation features (not available in this synthetic set)
-- Add account-age and sender transaction-history-length features
-- Try an ensemble of XGBoost + an autoencoder-based anomaly score
-- Move to a two-tier system: auto-block above a high-confidence threshold,
-  route medium-confidence scores to a human review queue (this is how real
-  bank fraud systems balance precision and recall)
+* Accuracy
+* Precision
+* Recall
+* F1 Score
+* ROC-AUC
+* PR-AUC
+* Confusion Matrix
+* Model comparison
+
+### 2. Regional & Category Risk
+
+Displays:
+
+* State-wise flagged transaction rate
+* Merchant-category flagged transaction rate
+* Risk aggregation
+* Visual charts
+
+### 3. Transaction Scoring
+
+Users can enter transaction information and receive:
+
+```text
+Fraud Probability
+        ↓
+Risk Classification
+        ↓
+Potentially Suspicious / Legitimate
+```
+
+---
+
+# 📁 Project Structure
+
+```text
+upi_fraud_project/
+│
+├── data/
+│   ├── upi_transactions.csv
+│   └── upi_transactions_features.csv
+│
+├── models/
+│   ├── xgb_fraud_model.pkl
+│   ├── scaler.pkl
+│   ├── label_encoders.pkl
+│   └── best_threshold.json
+│
+├── outputs/
+│   ├── model_metrics.json
+│   ├── model_comparison.csv
+│   ├── model_comparison.png
+│   ├── confusion_matrix.png
+│   ├── feature_importance.png
+│   ├── regional_risk.csv
+│   └── category_risk.csv
+│
+├── src/
+│   ├── generate_data.py
+│   ├── feature_engineering.py
+│   ├── train_model.py
+│   └── app.py
+│
+├── README.md
+└── requirements.txt
+```
+
+---
+
+# 🛠️ Technology Stack
+
+### Programming Language
+
+* Python
+
+### Data Processing
+
+* Pandas
+* NumPy
+
+### Machine Learning
+
+* Scikit-learn
+* XGBoost
+* Imbalanced-learn
+* SMOTE
+
+### Data Visualization
+
+* Matplotlib
+* Seaborn
+* Plotly
+
+### Dashboard
+
+* Streamlit
+
+### Model Persistence
+
+* Joblib
+
+---
+
+# 💻 System Requirements
+
+Recommended:
+
+```text
+Python 3.9+
+RAM: 8 GB+
+Storage: 1 GB+
+Operating System: Windows / Linux / macOS
+```
+
+No GPU is required.
+
+---
+
+# ⚙️ Installation
+
+## 1. Clone the Repository
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+```
+
+Example:
+
+```bash
+git clone https://github.com/yourusername/upi-fraudguard-ai.git
+```
+
+---
+
+## 2. Navigate to the Project
+
+```bash
+cd upi-fraudguard-ai
+```
+
+---
+
+## 3. Create a Virtual Environment
+
+### Windows
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### macOS / Linux
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+---
+
+# 📦 Install Dependencies
+
+Install all required Python packages:
+
+```bash
+pip install pandas numpy scikit-learn imbalanced-learn xgboost matplotlib seaborn streamlit plotly joblib
+```
+
+Alternatively, if a `requirements.txt` file is included:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# ▶️ How to Run
+
+The project must be executed in the following order.
+
+## Step 1 — Generate Dataset
+
+```bash
+python src/generate_data.py
+```
+
+This generates the synthetic UPI transaction dataset.
+
+Output:
+
+```text
+data/upi_transactions.csv
+```
+
+---
+
+## Step 2 — Feature Engineering
+
+```bash
+python src/feature_engineering.py
+```
+
+This processes the raw dataset and creates behavioral features.
+
+Output:
+
+```text
+data/upi_transactions_features.csv
+```
+
+---
+
+## Step 3 — Train the Models
+
+```bash
+python src/train_model.py
+```
+
+This step:
+
+* Loads the engineered dataset
+* Performs the time-aware train/test split
+* Applies SMOTE to training data
+* Trains multiple ML models
+* Evaluates model performance
+* Tunes the classification threshold
+* Saves the XGBoost model
+* Generates evaluation metrics
+* Generates charts
+* Creates regional risk analysis
+* Creates merchant-category risk analysis
+
+Generated files include:
+
+```text
+models/xgb_fraud_model.pkl
+models/scaler.pkl
+models/label_encoders.pkl
+models/best_threshold.json
+```
+
+and:
+
+```text
+outputs/model_metrics.json
+outputs/model_comparison.csv
+outputs/model_comparison.png
+outputs/confusion_matrix.png
+outputs/feature_importance.png
+outputs/regional_risk.csv
+outputs/category_risk.csv
+```
+
+---
+
+# 🚀 Step 4 — Launch the Dashboard
+
+Run:
+
+```bash
+streamlit run src/app.py
+```
+
+After starting Streamlit, open:
+
+```text
+http://localhost:8501
+```
+
+in your browser.
+
+---
+
+# 🔄 Complete One-Command Workflow
+
+After cloning and installing dependencies, the complete workflow is:
+
+```bash
+python src/generate_data.py
+python src/feature_engineering.py
+python src/train_model.py
+streamlit run src/app.py
+```
+
+Run the commands in this exact order.
+
+---
+
+# 📈 Generated Outputs
+
+The training pipeline generates several analytical outputs.
+
+### Model Comparison
+
+```text
+outputs/model_comparison.csv
+outputs/model_comparison.png
+```
+
+Compares the performance of all trained models.
+
+### Confusion Matrix
+
+```text
+outputs/confusion_matrix.png
+```
+
+Shows:
+
+* True Positives
+* True Negatives
+* False Positives
+* False Negatives
+
+### Feature Importance
+
+```text
+outputs/feature_importance.png
+```
+
+Shows which behavioral features contribute most to the XGBoost model.
+
+### Regional Risk
+
+```text
+outputs/regional_risk.csv
+```
+
+Contains state-level flagged transaction rates.
+
+### Category Risk
+
+```text
+outputs/category_risk.csv
+```
+
+Contains merchant-category flagged transaction rates.
+
+---
+
+# 🔐 Fraud Detection Logic
+
+The system considers multiple behavioral signals rather than relying on transaction amount alone.
+
+```text
+Transaction
+     │
+     ├── Amount Analysis
+     │
+     ├── Transaction Velocity
+     │
+     ├── Time Analysis
+     │
+     ├── Device Behavior
+     │
+     ├── Bank Combination
+     │
+     └── Historical Sender Behavior
+             │
+             ↓
+       Feature Engineering
+             │
+             ↓
+          XGBoost
+             │
+             ↓
+       Fraud Probability
+             │
+             ↓
+      Tuned Threshold
+             │
+       ┌─────┴─────┐
+       ↓           ↓
+   Legitimate   Suspicious
+```
+
+---
+
+# ⚠️ Limitations
+
+This project is an academic/prototype implementation and has several limitations.
+
+### Synthetic Data
+
+The dataset does not represent actual bank or NPCI transactions.
+
+### Limited Features
+
+Real-world fraud detection systems can use additional signals such as:
+
+* Device fingerprints
+* IP addresses
+* GPS/geolocation
+* Account age
+* SIM information
+* Network information
+* Historical account behavior
+* Beneficiary history
+
+These are not included because real transaction-level datasets are unavailable.
+
+### Recall
+
+The current model detects approximately 50% of fraud cases at the selected threshold.
+
+Increasing recall may increase false positives.
+
+Real fraud detection systems typically use multiple risk tiers and human review rather than relying on a single binary prediction.
+
+---
+
+# 🔮 Future Improvements
+
+Future versions could include:
+
+* Device fingerprinting
+* IP and geolocation analysis
+* Account-age features
+* Beneficiary relationship analysis
+* Real-time transaction streaming
+* Autoencoder-based anomaly detection
+* Graph-based fraud detection
+* XGBoost + neural network ensemble
+* Real-time fraud alerts
+* Two-stage fraud review system
+* Explainable AI using SHAP
+* Model monitoring and drift detection
+* Production API using FastAPI
+* Cloud deployment
+* Database integration
+
+---
+
+# 🧪 Future Two-Tier Detection System
+
+A production-oriented implementation could use two risk levels:
+
+```text
+Transaction
+     ↓
+Risk Model
+     ↓
+ ┌───────────────┐
+ │ Fraud Score   │
+ └───────┬───────┘
+         │
+    ┌────┴────┐
+    ↓         ↓
+High Risk   Medium Risk
+    ↓         ↓
+Auto Action  Human Review
+```
+
+This approach can help balance fraud detection with false-positive control.
+
+---
+
+# 🎯 Project Objective
+
+The primary objective of UPI FraudGuard AI is to demonstrate how Machine Learning and behavioral analytics can be applied to digital payment fraud detection.
+
+The project focuses not only on identifying suspicious transactions but also on understanding **where and in which merchant categories suspicious activity is concentrated**.
+
+---
+
+# 📚 Learning Outcomes
+
+Through this project, the following concepts are demonstrated:
+
+* Data generation
+* Data preprocessing
+* Exploratory data analysis
+* Feature engineering
+* Imbalanced classification
+* SMOTE
+* Time-series-aware splitting
+* Logistic Regression
+* Decision Trees
+* Random Forest
+* XGBoost
+* Hyperparameter/threshold optimization
+* Precision-recall analysis
+* ROC-AUC
+* PR-AUC
+* Model persistence
+* Data visualization
+* Streamlit dashboard development
+* Risk aggregation
+
+---
+
+# ⚖️ Disclaimer
+
+This project is created for **educational, research, and demonstration purposes**.
+
+The dataset is synthetic and does not contain real UPI, bank, NPCI, customer, or payment information.
+
+The model should not be used to make real financial decisions or automatically block transactions without proper validation, monitoring, security testing, regulatory compliance, and human oversight.
+
+Regional and merchant-category risk results are generated from synthetic data and should not be interpreted as real-world fraud statistics.
+
+---
+
+# 👨‍💻 Author
+
+**Your Name**
+
+Machine Learning | Data Science | AI
+
+---
+
+## ⭐ If You Find This Project Useful
+
+Consider giving the repository a ⭐ on GitHub.
+
+```text
+UPI FraudGuard AI
+Machine Learning + Behavioral Analytics + Fraud Risk Detection
+```
+
+```
+```
