@@ -1,0 +1,19 @@
+{
+  "threshold": 0.29516905546188354,
+  "feature_cols": [
+    "amount",
+    "hour_of_day",
+    "is_weekend",
+    "txn_velocity_1h",
+    "amount_deviation_ratio",
+    "is_odd_hour",
+    "device_switch_flag",
+    "cross_bank_flag",
+    "sender_state_enc",
+    "sender_bank_enc",
+    "receiver_bank_enc",
+    "merchant_category_enc",
+    "device_type_enc",
+    "network_type_enc"
+  ]
+}

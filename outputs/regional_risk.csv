@@ -1,0 +1,11 @@
+sender_state,total_txns,flagged,avg_fraud_prob,flagged_rate_pct
+Tamil Nadu,2415,16,0.012461781,0.663
+Karnataka,2675,13,0.013021172,0.486
+Delhi,2178,10,0.012296505,0.459
+Telangana,2215,10,0.01120431,0.451
+Andhra Pradesh,2102,7,0.008056403,0.333
+Uttar Pradesh,3074,10,0.008103664,0.325
+Gujarat,1926,6,0.010381334,0.312
+West Bengal,1991,6,0.0041518183,0.301
+Rajasthan,1616,4,0.008372303,0.248
+Maharashtra,3808,9,0.009265183,0.236
